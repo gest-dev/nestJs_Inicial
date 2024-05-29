@@ -3,10 +3,10 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-  BadRequestException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import * as Joi from 'joi';
+import Joi from 'joi';
 
 @Injectable()
 export class JoiValidationInterceptor implements NestInterceptor {
@@ -30,8 +30,8 @@ export class JoiValidationInterceptor implements NestInterceptor {
         }
         allErrors[keyText].push(errorMessage);
       });
-
-      throw new BadRequestException({
+      //status 422 Unprocessable Entity
+      throw new UnprocessableEntityException({
         message: firstError,
         errors: allErrors,
       });
@@ -40,7 +40,6 @@ export class JoiValidationInterceptor implements NestInterceptor {
   }
 
   private combineParameters(request: any): any {
-
     const params = request.params || {};
     const body = request.body || {};
     const query = request.query || {};

@@ -26,7 +26,8 @@ const loginSchema = Joi.object({
     .pattern(securityCodePattern)
     .label('Código de Segurança')
     .messages({
-      'string.pattern.base': '{{#label}} com valor {:[.]} não confere com o padrão requerido.',
+      'string.pattern.base':
+        '{{#label}} com valor {:[.]} não confere com o padrão requerido.',
     }),
 }).options({
   errors: {

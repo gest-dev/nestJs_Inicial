@@ -6,13 +6,13 @@ import {
 } from '@nestjs/common';
 
 @Injectable()
-export class PermissionGuard implements CanActivate {
-  constructor(private permission: Array<string>) { }
+export class RoleGuard implements CanActivate {
+  constructor(private role: Array<string>) {}
 
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest();
     try {
-      if (!this.permission) {
+      if (!this.role) {
         return true; // Se nenhuma permissão específica é necessária, permite o acesso
       }
 
@@ -20,21 +20,17 @@ export class PermissionGuard implements CanActivate {
         throw new ForbiddenException('Forbidden!');
       }
 
-      if (!(req.user?.roles && req.user?.roles.length > 0)) {
+      if (!(req.user?.roles && req.user.roles?.length < 1)) {
         throw new ForbiddenException('Forbidden!');
       }
-      let permissionsExists = false;
 
-      for (const key in req.user.roles) {
-        const perExists = req.user.roles[key]?.permissions
-          ? req.user.roles[key]?.permissions
-              .map((perm: any) => perm?.name)
-              .some((perm: string) => this.permission.includes(perm))
-          : false;
-        if (perExists) permissionsExists = true;
-      }
+      const userRoles = req.user.roles.map((roleI: any) => roleI.name);
 
-      if (!permissionsExists) {
+      const rolesExists = this.role.some((roleI: string) =>
+        userRoles.includes(roleI),
+      );
+
+      if (!rolesExists) {
         throw new ForbiddenException('Forbidden!');
       }
       return true;
